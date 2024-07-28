@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Customer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Edit Customer</h2>
+    <form id="edit-form">
+      <input type="hidden" id="customer-id">
+      <input type="text" id="first_name" placeholder="First Name">
+      <input type="text" id="last_name" placeholder="Last Name">
+      <input type="text" id="street" placeholder="Street">
+      <input type="text" id="address" placeholder="Address">
+      <input type="text" id="city" placeholder="City">
+      <input type="text" id="state" placeholder="State">
+      <input type="email" id="email" placeholder="Email">
+      <input type="text" id="phone" placeholder="Phone">
+      <button type="button" onclick="updateCustomer()">Update</button>
+    </form>
+    <button onclick="cancel()">Cancel</button>
+  </div>
+  <script src="edit-customer.js"></script>
+</body>
+</html>
