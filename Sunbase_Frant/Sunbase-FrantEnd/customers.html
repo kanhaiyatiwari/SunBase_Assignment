@@ -9,6 +9,16 @@
 <body>
   <div class="container">
     <h2>Customers</h2>
+    <div class="controls">
+      <input type="text" id="searchTerm" placeholder="Search by name">
+      <input type="text" id="cityFilter" placeholder="Filter by city">
+      <input type="text" id="stateFilter" placeholder="Filter by state">
+      <button onclick="applyFilters()">Apply Filters</button>
+      <select id="sortOrder" onchange="applyFilters()">
+        <option value="asc">Sort A-Z</option>
+        <option value="desc">Sort Z-A</option>
+      </select>
+    </div>
     <button onclick="syncCustomers()">Sync Customers</button>
     <table id="customers-table">
       <thead>

@@ -1,10 +1,10 @@
 package com.sunBase.contoller;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sunBase.model.Customer;
@@ -120,6 +121,43 @@ public class CustomerController {
 	
 	
 	
+
 	
 	
+    @GetMapping("/searchname")
+    public ResponseEntity<List<Customer>> searchCustomers(@RequestParam("searchTerm") String searchTerm, @RequestHeader("Authorization") String authorizationHeader) {
+        String jwtToken = extractJwtToken(authorizationHeader);
+        List<Customer> customers = customerServices.searchCustomers(searchTerm, jwtToken);
+        return new ResponseEntity<>(customers, HttpStatus.OK);
+    }
+
+
+    
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Customer>> searchCustomers(
+        @RequestParam("searchTerm") String searchTerm, 
+        @RequestParam(value = "city", required = false) String city, 
+        @RequestParam(value = "state", required = false) String state, 
+        @RequestParam(value = "street", required = false) String street, 
+        @RequestHeader("Authorization") String authorizationHeader) {
+
+        String jwtToken = extractJwtToken(authorizationHeader);
+        List<Customer> customers = customerServices.searchCustomersfilter(searchTerm, city, state, street);
+        return new ResponseEntity<>(customers, HttpStatus.OK);
+    }
+
+    @GetMapping("/getAllCustomersSorted")
+    public ResponseEntity<Page<Customer>> getAllCustomersSorted(
+        @RequestParam("page") int page,
+        @RequestParam("size") int size,
+        @RequestParam("sortBy") String sortBy,
+        @RequestHeader("Authorization") String authorizationHeader) {
+
+        String jwtToken = extractJwtToken(authorizationHeader);
+        Page<Customer> customers = customerServices.getAllCustomersSorted(page, size, sortBy);
+        return new ResponseEntity<>(customers, HttpStatus.OK);
+    }
+    
+    
 }

@@ -3,9 +3,11 @@ package com.sunBase.service;
 import java.util.List;
 import java.util.Optional;
 
-import javax.security.auth.login.LoginException;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.sunBase.exception.CustomerException;
@@ -176,4 +178,36 @@ public class CustomerServiceImpl implements CustomerServices{
 				
 	}
 
+
+
+	@Override
+	public List<Customer> searchCustomers(String searchTerm,String token) throws CustomerException, TokenException {
+		// TODO Auto-generated method stub
+		Claims claims = jwtTokenValidatorFilter.tokenValidatingforCustomar(token);
+		if (claims == null) {
+			throw new TokenException("Please login");
+		}
+		return customerRepo.searchByFirstNameOrLastName(searchTerm);
+	}
+	
+	
+	   @Override
+	    public List<Customer> searchCustomersfilter(String searchTerm, String city, String state, String street) throws CustomerException, TokenException {
+	        return customerRepo.filterAndSearchCustomers(searchTerm, city, state, street);
+	    }
+
+	   @Override
+	   public Page<Customer> getAllCustomersSorted(int page, int size, String sortBy) throws CustomerException, TokenException {
+	       Pageable pageable = PageRequest.of(page, size);
+	       if (sortBy.equalsIgnoreCase("asc")) {
+	           return customerRepo.findAllSortedAsc(pageable);
+	       } else if (sortBy.equalsIgnoreCase("desc")) {
+	           return customerRepo.findAllSortedDesc(pageable);
+	       } else {
+	           throw new CustomerException("Invalid sortBy parameter");
+	       }
+	   }
+
+	
+	
 }
