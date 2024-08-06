@@ -80,11 +80,11 @@ public class ApiService {
         return Arrays.asList(response.getBody());
     }
 
-    public String authenticateFetchAndSyncCustomerList() {
+    public String authenticateFetchAndSyncCustomerList( String jwtToken) {
         String token = authenticate();
         if (token != null) {
             List<Customer> customerList = getCustomerList(token);
-            return customerServices.syncCustomersApi(customerList);
+            return customerServices.syncCustomersApi(customerList,jwtToken);
         } else {
             throw new RuntimeException("Failed to authenticate and retrieve token");
         }

@@ -34,5 +34,5 @@ public interface CustomerRepo extends JpaRepository<Customer, String> {
 
 	    @Query("SELECT c FROM Customer c ORDER BY c.first_name DESC")
 	    Page<Customer> findAllSortedDesc(Pageable pageable);
-
+	
 }

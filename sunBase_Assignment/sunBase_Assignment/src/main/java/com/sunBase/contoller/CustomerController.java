@@ -105,17 +105,13 @@ public class CustomerController {
 	
 	
 	 @GetMapping("/sync-customers")
-	    public ResponseEntity<String> syncCustomers() {
-	        String result = apiService.authenticateFetchAndSyncCustomerList();
+	    public ResponseEntity<String> syncCustomers(@RequestHeader("Authorization") String authorizationHeader) {
+		 String jwtToken = extractJwtToken(authorizationHeader);
+	        String result = apiService.authenticateFetchAndSyncCustomerList(jwtToken);
 	        return new ResponseEntity<>(result, HttpStatus.OK);
 	    }
 	
-	@PostMapping("/syncCustomers")
-    public ResponseEntity<String> syncCustomers(@RequestBody List<Customer> customers) {
-		String ans=customerServices.syncCustomersApi(customers);
-        return new ResponseEntity<>(ans,HttpStatus.OK);
-    }
-	
+
 	
 	
 	
@@ -143,19 +139,19 @@ public class CustomerController {
         @RequestHeader("Authorization") String authorizationHeader) {
 
         String jwtToken = extractJwtToken(authorizationHeader);
-        List<Customer> customers = customerServices.searchCustomersfilter(searchTerm, city, state, street);
+        List<Customer> customers = customerServices.searchCustomersfilter(searchTerm, city, state, street,jwtToken);
         return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 
     @GetMapping("/getAllCustomersSorted")
     public ResponseEntity<Page<Customer>> getAllCustomersSorted(
-        @RequestParam("page") int page,
-        @RequestParam("size") int size,
-        @RequestParam("sortBy") String sortBy,
+    		 @RequestParam(value = "page", defaultValue = "0") int page,
+    	        @RequestParam(value = "size", defaultValue = "10") int size,
+    	        @RequestParam(value = "sortBy", defaultValue = "asc") String sortBy,
         @RequestHeader("Authorization") String authorizationHeader) {
 
         String jwtToken = extractJwtToken(authorizationHeader);
-        Page<Customer> customers = customerServices.getAllCustomersSorted(page, size, sortBy);
+        Page<Customer> customers = customerServices.getAllCustomersSorted(page, size, sortBy,jwtToken);
         return new ResponseEntity<>(customers, HttpStatus.OK);
     }
     

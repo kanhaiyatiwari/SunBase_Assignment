@@ -152,10 +152,13 @@ public class CustomerServiceImpl implements CustomerServices{
 	}
 
 	@Override
-	public String syncCustomersApi(List<Customer> customers) throws CustomerException {
+	public String syncCustomersApi(List<Customer> customers,String jwtToken) throws CustomerException {
 		// TODO Auto-generated method stub
 		
-		
+		Claims claims = jwtTokenValidatorFilter.tokenValidatingforCustomar(jwtToken);
+		if (claims == null) {
+			throw new TokenException("Please login");
+		}
 		for (Customer customer : customers) {
             Optional<Customer> existingCustomer = customerRepo.findByEmail(customer.getEmail());
             if (existingCustomer.isPresent()) {
@@ -192,13 +195,18 @@ public class CustomerServiceImpl implements CustomerServices{
 	
 	
 	   @Override
-	    public List<Customer> searchCustomersfilter(String searchTerm, String city, String state, String street) throws CustomerException, TokenException {
+	    public List<Customer> searchCustomersfilter(String searchTerm, String city, String state, String street,String jwtToken) throws CustomerException, TokenException {
 	        return customerRepo.filterAndSearchCustomers(searchTerm, city, state, street);
 	    }
 
 	   @Override
-	   public Page<Customer> getAllCustomersSorted(int page, int size, String sortBy) throws CustomerException, TokenException {
-	       Pageable pageable = PageRequest.of(page, size);
+	   public Page<Customer> getAllCustomersSorted(int page, int size, String sortBy,String jwtToken) throws CustomerException, TokenException {
+		   Claims claims = jwtTokenValidatorFilter.tokenValidatingforCustomar(jwtToken);
+			if (claims == null) {
+				throw new TokenException("Please login");
+			}
+		   
+		   Pageable pageable = PageRequest.of(page, size);
 	       if (sortBy.equalsIgnoreCase("asc")) {
 	           return customerRepo.findAllSortedAsc(pageable);
 	       } else if (sortBy.equalsIgnoreCase("desc")) {
