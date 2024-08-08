@@ -1,10 +1,13 @@
 const API_URL = 'http://localhost:8888/api/sunBase';
 
+let currentPage = 0;
+
 document.addEventListener('DOMContentLoaded', () => {
     getCustomers();
 });
 
-async function getCustomers(searchTerm = '', city = '', state = '', sortOrder = 'asc') {
+async function getCustomers(searchTerm = '', city = '', state = '', sortOrder = 'asc', page = 0) {
+    console.log(page);
     const token = localStorage.getItem('jwtToken');
   
     if (!token) {
@@ -16,7 +19,10 @@ async function getCustomers(searchTerm = '', city = '', state = '', sortOrder = 
     url.searchParams.append('searchTerm', searchTerm);
     if (city) url.searchParams.append('city', city);
     if (state) url.searchParams.append('state', state);
-    url.searchParams.append('sortBy', sortOrder);
+    url.searchParams.append('sort', 'first_name');
+    url.searchParams.append('dir', sortOrder);
+    url.searchParams.append('page', page);
+    url.searchParams.append('size', 4);
 
     try {
         const response = await fetch(url, {
@@ -27,7 +33,8 @@ async function getCustomers(searchTerm = '', city = '', state = '', sortOrder = 
         });
 
         if (response.ok) {
-            const customers = await response.json();
+            const customersPage = await response.json();
+            const customers = customersPage.content;
             const customerTableBody = document.getElementById('customers');
             customerTableBody.innerHTML = '';
   
@@ -46,6 +53,9 @@ async function getCustomers(searchTerm = '', city = '', state = '', sortOrder = 
                 `;
                 customerTableBody.appendChild(tr);
             });
+
+            document.getElementById('prevPageButton').disabled = customersPage.first;
+            document.getElementById('nextPageButton').disabled = customersPage.last;
         } else {
             alert('Failed to fetch customers!');
         }
@@ -60,10 +70,24 @@ function applyFilters() {
     const state = document.getElementById('stateFilter').value;
     const sortOrder = document.getElementById('sortOrder').value;
 
-    getCustomers(searchTerm, city, state, sortOrder);
+    
+    getCustomers(searchTerm, city, state, sortOrder, currentPage);
+}
+
+function nextPage() {
+    currentPage++;
+    applyFilters();
+}
+
+function prevPage() {
+    if (currentPage > 0) {
+        currentPage--;
+        applyFilters();
+    }
 }
 
 async function syncCustomers() {
+
     const token = localStorage.getItem('jwtToken');
   
     if (!token) {
@@ -93,6 +117,7 @@ async function syncCustomers() {
     } catch (error) {
         console.error('Error:', error);
     }
+    
 }
 
 function editCustomer(uuid) {

@@ -183,39 +183,22 @@ public class CustomerServiceImpl implements CustomerServices{
 
 
 
-	@Override
-	public List<Customer> searchCustomers(String searchTerm,String token) throws CustomerException, TokenException {
-		// TODO Auto-generated method stub
-		Claims claims = jwtTokenValidatorFilter.tokenValidatingforCustomar(token);
-		if (claims == null) {
-			throw new TokenException("Please login");
-		}
-		return customerRepo.searchByFirstNameOrLastName(searchTerm);
-	}
 	
 	
 	   @Override
-	    public List<Customer> searchCustomersfilter(String searchTerm, String city, String state, String street,String jwtToken) throws CustomerException, TokenException {
-	        return customerRepo.filterAndSearchCustomers(searchTerm, city, state, street);
-	    }
-
-	   @Override
-	   public Page<Customer> getAllCustomersSorted(int page, int size, String sortBy,String jwtToken) throws CustomerException, TokenException {
-		   Claims claims = jwtTokenValidatorFilter.tokenValidatingforCustomar(jwtToken);
+	   public Page<Customer> searchAndFilterCustomers(String searchTerm, String city, String state, String street, Pageable pageable,String token) throws CustomerException, TokenException {
+		   Claims claims = jwtTokenValidatorFilter.tokenValidatingforCustomar(token);
 			if (claims == null) {
 				throw new TokenException("Please login");
 			}
 		   
-		   Pageable pageable = PageRequest.of(page, size);
-	       if (sortBy.equalsIgnoreCase("asc")) {
-	           return customerRepo.findAllSortedAsc(pageable);
-	       } else if (sortBy.equalsIgnoreCase("desc")) {
-	           return customerRepo.findAllSortedDesc(pageable);
-	       } else {
-	           throw new CustomerException("Invalid sortBy parameter");
-	       }
-	   }
+		   Page<Customer> customers = customerRepo.filterAndSearchCustomers(searchTerm, city, state, street, pageable);
+	        if (customers.isEmpty()) {
+	            throw new CustomerException("No customers found matching the given criteria.");
+	        }
+	        return customers;
+	    }
 
-	
+	  
 	
 }

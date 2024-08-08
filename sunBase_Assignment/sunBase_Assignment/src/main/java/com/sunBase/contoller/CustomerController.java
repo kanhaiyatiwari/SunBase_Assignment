@@ -5,6 +5,9 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -87,8 +90,7 @@ public class CustomerController {
 	public ResponseEntity<Customer> currentCustomer(@RequestHeader("Authorization") String authorizationHeader){
 		String jwtToken = extractJwtToken(authorizationHeader);
 		Customer customer = customerServices.currentCustomer(jwtToken);
-		
-//		System.out.println(customer);
+
 		return new ResponseEntity<Customer>(customer, HttpStatus.OK);
 	}
 	public ResponseEntity<List<Customer>> customers;
@@ -114,46 +116,25 @@ public class CustomerController {
 
 	
 	
-	
-	
-	
-
-	
-	
-    @GetMapping("/searchname")
-    public ResponseEntity<List<Customer>> searchCustomers(@RequestParam("searchTerm") String searchTerm, @RequestHeader("Authorization") String authorizationHeader) {
-        String jwtToken = extractJwtToken(authorizationHeader);
-        List<Customer> customers = customerServices.searchCustomers(searchTerm, jwtToken);
-        return new ResponseEntity<>(customers, HttpStatus.OK);
-    }
-
-
-    
 
     @GetMapping("/search")
-    public ResponseEntity<List<Customer>> searchCustomers(
-        @RequestParam("searchTerm") String searchTerm, 
-        @RequestParam(value = "city", required = false) String city, 
-        @RequestParam(value = "state", required = false) String state, 
-        @RequestParam(value = "street", required = false) String street, 
-        @RequestHeader("Authorization") String authorizationHeader) {
-
+    public Page<Customer> searchCustomers(
+        @RequestParam(value = "searchTerm", required = false) String searchTerm,
+        @RequestParam(value = "city", required = false) String city,
+        @RequestParam(value = "state", required = false) String state,
+        @RequestParam(value = "street", required = false) String street,
+        @RequestParam(value = "page", defaultValue = "0") int page,
+        @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value = "sort", defaultValue = "first_name") String sort,
+        @RequestParam(value = "dir", defaultValue = "asc") String dir,
+        @RequestHeader("Authorization") String authorizationHeader
+    ) {
+        Sort.Direction direction = dir.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sort));
         String jwtToken = extractJwtToken(authorizationHeader);
-        List<Customer> customers = customerServices.searchCustomersfilter(searchTerm, city, state, street,jwtToken);
-        return new ResponseEntity<>(customers, HttpStatus.OK);
+        return customerServices.searchAndFilterCustomers(searchTerm, city, state, street, pageable,jwtToken);
     }
-
-    @GetMapping("/getAllCustomersSorted")
-    public ResponseEntity<Page<Customer>> getAllCustomersSorted(
-    		 @RequestParam(value = "page", defaultValue = "0") int page,
-    	        @RequestParam(value = "size", defaultValue = "10") int size,
-    	        @RequestParam(value = "sortBy", defaultValue = "asc") String sortBy,
-        @RequestHeader("Authorization") String authorizationHeader) {
-
-        String jwtToken = extractJwtToken(authorizationHeader);
-        Page<Customer> customers = customerServices.getAllCustomersSorted(page, size, sortBy,jwtToken);
-        return new ResponseEntity<>(customers, HttpStatus.OK);
-    }
+  
     
     
 }

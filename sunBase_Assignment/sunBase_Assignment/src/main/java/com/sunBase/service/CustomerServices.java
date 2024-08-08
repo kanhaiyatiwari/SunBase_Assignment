@@ -3,6 +3,7 @@ package com.sunBase.service;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.sunBase.exception.CustomerException;
 import com.sunBase.exception.TokenException;
@@ -24,7 +25,6 @@ public interface CustomerServices {
 	
 	public Customer currentCustomer(String token) throws CustomerException, TokenException;
 	
-	public List<Customer> searchCustomers(String searchTerm,String token) throws CustomerException, TokenException;
-	public List<Customer> searchCustomersfilter(String searchTerm, String city, String state, String street,String jwtToken)throws CustomerException, TokenException;
-	public Page<Customer> getAllCustomersSorted(int page, int size, String sortBy,String jwtToken)throws CustomerException, TokenException;
+
+	public  Page<Customer> searchAndFilterCustomers(String searchTerm, String city, String state, String street, Pageable pageable,String token)throws CustomerException, TokenException;
 }

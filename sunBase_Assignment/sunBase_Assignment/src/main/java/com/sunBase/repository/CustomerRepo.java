@@ -20,14 +20,19 @@ public interface CustomerRepo extends JpaRepository<Customer, String> {
 	  
 	    @Query("SELECT c FROM Customer c WHERE LOWER(c.first_name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(c.last_name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
 	    List<Customer> searchByFirstNameOrLastName(@Param("searchTerm")String searchTerm);
-
-	    @Query("SELECT c FROM Customer c WHERE (LOWER(c.first_name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(c.last_name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) AND (:city IS NULL OR c.city = :city) AND (:state IS NULL OR c.state = :state) AND (:street IS NULL OR c.street = :street)")
-	    List<Customer> filterAndSearchCustomers(
-	        @Param("searchTerm") String searchTerm, 
-	        @Param("city") String city, 
-	        @Param("state") String state, 
-	        @Param("street") String street
-	    );
+	    @Query("SELECT c FROM Customer c WHERE " +
+	            "(COALESCE(:searchTerm, '') = '' OR LOWER(c.first_name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+	            "LOWER(c.last_name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) AND " +
+	            "(COALESCE(:city, '') = '' OR c.city = :city) AND " +
+	            "(COALESCE(:state, '') = '' OR c.state = :state) AND " +
+	            "(COALESCE(:street, '') = '' OR c.street = :street)")
+	     Page<Customer> filterAndSearchCustomers(
+	         @Param("searchTerm") String searchTerm, 
+	         @Param("city") String city, 
+	         @Param("state") String state, 
+	         @Param("street") String street,
+	         Pageable pageable
+	     );
 
 	    @Query("SELECT c FROM Customer c ORDER BY c.first_name ASC")
 	    Page<Customer> findAllSortedAsc(Pageable pageable);
