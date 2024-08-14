@@ -110,21 +110,21 @@ Follow these steps to set up and run the project locally.
 
 ## Screenshots
 
-### Customer List
+### Admin :-Signup/login
 
-![Customer List](screenshots/customer_list.png)
+![logo](https://github.com/kanhaiyatiwari/kanhaiyatiwari/blob/main/gitBanner.png)
+
+### Customer list 
+
+![logo](https://github.com/kanhaiyatiwari/kanhaiyatiwari/blob/main/gitBanner.png)
 
 ### Add Customer
 
-![Add Customer](screenshots/add_customer.png)
+![logo](https://github.com/kanhaiyatiwari/kanhaiyatiwari/blob/main/gitBanner.png)
 
-### Edit Customer
+### update
 
-![Edit Customer](screenshots/edit_customer.png)
-
-### Signup
-
-![Signup](screenshots/signup.png)
+![logo](https://github.com/kanhaiyatiwari/kanhaiyatiwari/blob/main/gitBanner.png)
 
 ## Contact
 
