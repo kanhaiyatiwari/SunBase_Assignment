@@ -59,21 +59,54 @@ Follow these steps to set up and run the project locally.
 - **POST :-Admin** `/api/sunBase/auth/signup` - rigister as admin.
   - **Body**:
     ```json
-   {
-  "loginId": "admin123",
-  "password": "Admin@123"
+     {
+    "loginId": "admin123",
+    "password": "Admin@123"
+    }
+ ```
+- **GET:- Admin Login** `Endpoint: GET /auth/login
+    Description: Authenticate an admin using JWT./using basic auth
+ ```
+## Customer Endpoints
+-**Add a Customer** post:- /api/sunBase/addCustomer` - rigister as admin.
+```json
+    {
+  "first_name": "John",
+  "last_name": "Doe",
+  "street": "123 Main St",
+  "address": "Apt 101",
+  "city": "New York",
+  "state": "NY",
+  "email": "john.doe@example.com",
+  "phone": "123-456-7890"
 }
 
-    ```
-- **GET:- Admin Login** `Endpoint: GET /auth/login
-  - 
-    Description: Authenticate an admin using JWT./using basic auth
-    ```
+ ```
 - **GET** `/api/sunBase/getCustomers` - Retrieve all customers, requiring JWT authentication. 
 - **GET** `/api/sunBase/getCustomer/{id}` - Retrieve a customer by ID, requiring JWT authentication.
 - **PUT** `/api/sunBase/updateCustomer/{id}` - Update a customer by ID, requiring JWT authentication.
 - **DELETE** `/api/sunBase/deleteCustomer/{id}` - Delete a customer by ID, requiring JWT authentication.
 - **POST** `/api/sunBase/sync-customers` - Synchronize customer data from a remote API, requiring JWT authentication.
+
+### Search and Filter Customers
+
+**Endpoint:** `/search`  
+**Method:** `GET`  
+**Description:** Search and filter customers by various criteria.
+
+**Query Parameters:**
+- `searchTerm`: Filter by name (applies to both first and last name).
+- `city`: Filter by city.
+- `state`: Filter by state.
+- `email`: Filter by email.
+- `page`: Page number (default is 0).
+- `size`: Page size (default is 10).
+- `sort`: Sort by field (default is `first_name`).
+- `dir`: Sort direction (`asc` or `desc`, default is `asc`).
+
+**Example Request:**
+     ``` GET http://localhost:8888/api/sunBase/search?searchTerm=John&city=New+York&state=NY&email=john.doe@example.com&page=0&size=10&sort=first_name&dir=asc
+     ```
 
 ## Screenshots
 
