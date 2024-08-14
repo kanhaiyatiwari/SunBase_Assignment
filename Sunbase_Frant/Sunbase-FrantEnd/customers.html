@@ -9,17 +9,34 @@
 <body>
   <div class="container">
     <h2>Customers</h2>
-    <div class="controls">
-      <input type="text" id="searchTerm" placeholder="Search by name">
-      <input type="text" id="cityFilter" placeholder="Filter by city">
-      <input type="text" id="stateFilter" placeholder="Filter by state">
-      <button onclick="applyFilters()">Apply Filters</button>
-      <select id="sortOrder" onchange="applyFilters()">
-        <option value="asc">Sort A-Z</option>
-        <option value="desc">Sort Z-A</option>
-      </select>
+    <div class="navbar">
+      <button onclick="openAddCustomerPopup()">Add Customer</button>
+      <button onclick="syncCustomers()">Sync Customers</button>
+      
+      <div class="search-controls">
+        <select id="searchBy">
+          <option value="name">Search by Name</option>
+          <option value="city">Search by City</option>
+          <option value="phone">Search by Phone</option>
+          <option value="email">Search by Email</option>
+        </select>
+        <input type="text" id="searchTerm" placeholder="Search term">
+        <button onclick="applyFilters()">Search</button>
+        
+        <select id="sortBy">
+          <option value="first_name">Sort by Name</option>
+          <option value="city">Sort by City</option>
+          <option value="email">Sort by Email</option>
+          <option value="phone">Sort by Phone</option>
+        </select>
+        <select id="sortOrder">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+        <button onclick="applyFilters()">Sort</button>
+      </div>
     </div>
-    <button onclick="syncCustomers()">Sync Customers</button>
+    
     <table id="customers-table">
       <thead>
         <tr>
@@ -32,14 +49,45 @@
           <th>Email</th>
           <th>Phone</th>
           <th>Edit</th>
+          <th>Delete</th>
         </tr>
       </thead>
       <tbody id="customers"></tbody>
     </table>
-    <button id="prevPageButton" onclick="prevPage()">Previous</button>
-    <button id="nextPageButton" onclick="nextPage()">Next</button>
+    
+    <div class="pagination-controls">
+      <button id="prevPageButton" onclick="prevPage()">Previous</button>
+      <button id="nextPageButton" onclick="nextPage()">Next</button>
+    </div>
     <button onclick="logout()">Logout</button>
   </div>
+
+  <!-- Add Customer Popup -->
+  <div id="addCustomerPopup" class="popup">
+    <div class="popup-content">
+      <h3>Add New Customer</h3>
+      <label>First Name:</label>
+      <input type="text" id="newFirstName">
+      <label>Last Name:</label>
+      <input type="text" id="newLastName">
+      <label>Street:</label>
+      <input type="text" id="newStreet">
+      <label>Address:</label>
+      <input type="text" id="newAddress">
+      <label>City:</label>
+      <input type="text" id="newCity">
+      <label>State:</label>
+      <input type="text" id="newState">
+      <label>Email:</label>
+      <input type="email" id="newEmail">
+      <label>Phone:</label>
+      <input type="tel" id="newPhone">
+      <button onclick="addCustomer()">Add Customer</button>
+      <button onclick="closeAddCustomerPopup()">Cancel</button>
+    </div>
+  </div>
+
   <script src="customers.js"></script>
+  
 </body>
 </html>

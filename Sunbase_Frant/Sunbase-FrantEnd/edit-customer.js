@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function getCustomer(uuid) {
-  const token = localStorage.getItem('jwtToken');
+  const token = localStorage.getItem('authToken');
 
   if (!token) {
     window.location.href = 'index.html';
@@ -52,7 +52,7 @@ function populateCustomerForm(customer) {
 
 async function updateCustomer() {
   const uuid = new URLSearchParams(window.location.search).get('id');
-  const token = localStorage.getItem('jwtToken');
+  const token = localStorage.getItem('authToken');
 
   if (!uuid || !token) {
     alert('Missing customer ID or token');

@@ -18,13 +18,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.sunBase.model.Customer;
 
 @Service
-public class ApiService {
+public class SyncApiService {
 
     private final RestTemplate restTemplate;
     private final CustomerServices customerServices;
 
     @Autowired
-    public ApiService(RestTemplate restTemplate, CustomerServices customerServices) {
+    public SyncApiService(RestTemplate restTemplate, CustomerServices customerServices) {
         this.restTemplate = restTemplate;
         this.customerServices = customerServices;
     }
@@ -80,11 +80,11 @@ public class ApiService {
         return Arrays.asList(response.getBody());
     }
 
-    public String authenticateFetchAndSyncCustomerList( String jwtToken) {
+    public String authenticateFetchAndSyncCustomerList() {
         String token = authenticate();
         if (token != null) {
             List<Customer> customerList = getCustomerList(token);
-            return customerServices.syncCustomersApi(customerList,jwtToken);
+            return customerServices.syncCustomersApi(customerList);
         } else {
             throw new RuntimeException("Failed to authenticate and retrieve token");
         }

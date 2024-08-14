@@ -5,20 +5,12 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.sunBase.exception.CustomerException;
-import com.sunBase.exception.TokenException;
-import com.sunBase.jwtConfig.JwtTokenGeneratorFilter;
-import com.sunBase.jwtConfig.JwtTokenValidatorFilter;
 import com.sunBase.model.Customer;
-import com.sunBase.model.LoginDTO;
 import com.sunBase.repository.CustomerRepo;
-
-import io.jsonwebtoken.Claims;
 
 @Service
 public class CustomerServiceImpl implements CustomerServices{
@@ -26,19 +18,11 @@ public class CustomerServiceImpl implements CustomerServices{
 	@Autowired
 	private CustomerRepo customerRepo;
 	
-	@Autowired
-	private JwtTokenGeneratorFilter jwtTokenGeneratorFilter;
 	
-	@Autowired
-	private JwtTokenValidatorFilter jwtTokenValidatorFilter;
 
 	@Override
-	public Customer getCustomerBy_id(String id,String jwtToken){
-		Claims claims = jwtTokenValidatorFilter.tokenValidatingforCustomar(jwtToken);
-		if (claims == null) {
-			throw new TokenException("Please login");
-		}
-		// TODO Auto-generated method stub
+	public Customer getCustomerBy_id(String id){
+		
 		Optional<Customer> customer = customerRepo.findById(id);
 		if(customer.isEmpty()) {
 			throw new CustomerException("This costomer is not present in database");
@@ -49,156 +33,105 @@ public class CustomerServiceImpl implements CustomerServices{
 
 	@Override
 	public String createCustomer(Customer customer) {
-		// TODO Auto-generated method stub
-		Optional<Customer> c = customerRepo.findByEmail(customer.getEmail());
+	
+		Optional<Customer> c = customerRepo.findById(customer.getUuid());
 		if(!c.isEmpty()) {
 			throw new CustomerException("This costomer is allready present in database");
 		}
 		
-		Customer customer2 =  customerRepo.save(customer);
-		if(customer2 == null) {
-			throw new CustomerException("This customer not added ");
+		Customer savedCustomer = customerRepo.save(customer);
+		if(savedCustomer == null) {
+			throw new CustomerException("Failed to add customer.");
 		}
-		return "customer added successfully";
+		 return "Customer added successfully.";
 	}
 
 	@Override
-	public String updateCustomer(Customer customer, String id,String jwtToken) {
-		Claims claims = jwtTokenValidatorFilter.tokenValidatingforCustomar(jwtToken);
-		if (claims == null) {
-			throw new TokenException("Please login");
-		}
-		// TODO Auto-generated method stub
-		Optional<Customer> c = customerRepo.findById(id);
-		if(c.isEmpty()) {
-			throw new CustomerException("This costomer is not present in database");
-		}
-		
-		if(customer == null) {
-			throw new CustomerException("This customer  is not vaild");
-		}
-		c.get().setFirst_name(customer.getFirst_name());
-		c.get().setLast_name(customer.getLast_name());
-		c.get().setAdderess(customer.getAdderess());
-		c.get().setCity(customer.getCity());
-		c.get().setState(customer.getState());
-		c.get().setStreet(customer.getStreet());
-		c.get().setPhone(customer.getAdderess());
-		c.get().setEmail(customer.getEmail());
-		
-		Customer customer2 =  customerRepo.save(c.get());
-		if(customer2 == null) {
-			throw new CustomerException("This customer not updated ");
-		}
-		
-		
-		return "customer updated successfully";
-	}
+	public String updateCustomer(Customer customer, String id) {
+		 Customer existingCustomer = customerRepo.findById(id)
+	                .orElseThrow(() -> new CustomerException("Customer not found with ID: " + id));
 
+		 updateCustomerDetails(existingCustomer, customer);
+
+	        Customer updatedCustomer = customerRepo.save(existingCustomer);
+	        if (updatedCustomer == null) {
+	            throw new CustomerException("Failed to update customer.");
+	        }
+	        return "Customer updated successfully.";
+	    }
+
+	    private void updateCustomerDetails(final Customer existingCustomer, final Customer newDetails) {
+	        if (newDetails.getFirst_name() != null && !newDetails.getFirst_name().isBlank()) {
+	            existingCustomer.setFirst_name(newDetails.getFirst_name());
+	        }
+	        if (newDetails.getFirst_name() != null && !newDetails.getFirst_name().isBlank()) {
+	            existingCustomer.setFirst_name(newDetails.getFirst_name());
+	        }
+	        if (newDetails.getAddress() != null && !newDetails.getAddress().isBlank()) {
+	            existingCustomer.setAddress(newDetails.getAddress());
+	        }
+	        if (newDetails.getCity() != null && !newDetails.getCity().isBlank()) {
+	            existingCustomer.setCity(newDetails.getCity());
+	        }
+	        if (newDetails.getState() != null && !newDetails.getState().isBlank()) {
+	            existingCustomer.setState(newDetails.getState());
+	        }
+	        if (newDetails.getStreet() != null && !newDetails.getStreet().isBlank()) {
+	            existingCustomer.setStreet(newDetails.getStreet());
+	        }
+	        if (newDetails.getPhone() != null && !newDetails.getPhone().isBlank()) {
+	            existingCustomer.setPhone(newDetails.getPhone());
+	        }
+	        if (newDetails.getEmail() != null && !newDetails.getEmail().isBlank()) {
+	            existingCustomer.setEmail(newDetails.getEmail());
+	        }
+	    }
+
+	    
+	    
+	    
 	@Override
-	public String deleteCustomer(String id,String token) {
-		// TODO Auto-generated method stub
-		Claims claims = jwtTokenValidatorFilter.tokenValidatingforCustomar(token);
-		if (claims == null) {
-			throw new TokenException("Please login");
-		}
-		Optional<Customer> c = customerRepo.findById(id);
-		if(c.isEmpty()) {
-			throw new CustomerException("This costomer is not present in database");
-		}
-		
-        customerRepo.deleteById(id);
+	public String deleteCustomer(final String id) {
+        Customer customer = customerRepo.findById(id)
+                .orElseThrow(() -> new CustomerException("Customer not found with ID: " + id));
         
-        return "customer deletd successfully";
+        customerRepo.deleteById(id);
+        return "Customer deleted successfully.";
+    }
+
+	@Override
+	public List<Customer> CustomerList() throws  CustomerException{
+		 List<Customer> customers = customerRepo.findAll();
+	        if (customers.isEmpty()) {
+	            throw new CustomerException("No customers found.");
+	        }
+	        return customers;
 	}
 
 	@Override
-	public String forLoginCustomer(LoginDTO loginDTO) throws CustomerException, TokenException {
-		
-		Optional<Customer> customer = customerRepo.findByEmail(loginDTO.getEmail());
-
-		if (customer.isEmpty())
-			throw new CustomerException("Please enter a valid email");
-
-		if ( !customer.get().getPassword().equals(loginDTO.getPassword())) {
-			throw new CustomerException("Invalid Password...");
-		}
-
-		String token = jwtTokenGeneratorFilter.tokenGerneratorForCustomer(customer.get());
-
-		return token;
-	}
-
-	@Override
-	public Customer currentCustomer(String token) throws CustomerException, TokenException {
-		Claims claims = jwtTokenValidatorFilter.tokenValidatingforCustomar(token);
-		if (claims == null) {
-			throw new TokenException("Please login");
-		}
-		Customer existingCustomer = customerRepo.findById(claims.get("customertId", String.class))
-				.orElseThrow(() -> new CustomerException("Please login as Customer"));
-		
-		return existingCustomer;
-	}
-
-	@Override
-	public List<Customer> CustomerList(String jwtToken) throws  CustomerException, TokenException {
-		Claims claims = jwtTokenValidatorFilter.tokenValidatingforCustomar(jwtToken);
-		if (claims == null) {
-			throw new TokenException("Please login");
-		}
-		// TODO Auto-generated method stub
-		return customerRepo.findAll();
-	}
-
-	@Override
-	public String syncCustomersApi(List<Customer> customers,String jwtToken) throws CustomerException {
-		// TODO Auto-generated method stub
-		
-		Claims claims = jwtTokenValidatorFilter.tokenValidatingforCustomar(jwtToken);
-		if (claims == null) {
-			throw new TokenException("Please login");
-		}
-		for (Customer customer : customers) {
-            Optional<Customer> existingCustomer = customerRepo.findByEmail(customer.getEmail());
-            if (existingCustomer.isPresent()) {
-                // Update existing customer
-                Customer updateCustomer = existingCustomer.get();
-                updateCustomer.setFirst_name(customer.getFirst_name());
-                updateCustomer.setLast_name(customer.getLast_name());
-                updateCustomer.setStreet(customer.getStreet());
-                updateCustomer.setAdderess(customer.getAdderess());
-                updateCustomer.setCity(customer.getCity());
-                updateCustomer.setState(customer.getState());
-                updateCustomer.setPhone(customer.getPhone());
-                customerRepo.save(updateCustomer);
-            } else {
-                // Insert new customer
-                customerRepo.save(customer);
-            }
-        }
-		return "Customers synced successfully!";
+	public String syncCustomersApi(List<Customer> customers) throws CustomerException {
+	
+		 for (Customer customer : customers) {
+	            Optional<Customer> existingCustomer = customerRepo.findById(customer.getUuid());
+	            if (existingCustomer.isPresent()) {
+	                updateCustomerDetails(existingCustomer.get(), customer);
+	                customerRepo.save(existingCustomer.get());
+	            } else {
+	                customerRepo.save(customer);
+	            }
+	        }
+	        return "Customers synced successfully!";
 				
 	}
 
 
 
-	
-	
-	   @Override
-	   public Page<Customer> searchAndFilterCustomers(String searchTerm, String city, String state, String street, Pageable pageable,String token) throws CustomerException, TokenException {
-		   Claims claims = jwtTokenValidatorFilter.tokenValidatingforCustomar(token);
-			if (claims == null) {
-				throw new TokenException("Please login");
-			}
-		   
-		   Page<Customer> customers = customerRepo.filterAndSearchCustomers(searchTerm, city, state, street, pageable);
-	        if (customers.isEmpty()) {
-	            throw new CustomerException("No customers found matching the given criteria.");
-	        }
-	        return customers;
-	    }
-
-	  
-	
+	@Override
+	public Page<Customer> searchAndFilterCustomers(String searchTerm, String city, String state, String email, Pageable pageable) throws CustomerException {
+        Page<Customer> customers = customerRepo.filterAndSearchCustomers(searchTerm, city, state, email, pageable);
+        if (customers.isEmpty()) {
+            throw new CustomerException("No customers found matching the given criteria.");
+        }
+        return customers;
+    }
 }

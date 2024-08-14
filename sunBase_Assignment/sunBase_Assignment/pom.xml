@@ -60,7 +60,11 @@
 			<version>0.11.1</version>
 			<scope>runtime</scope>
 		</dependency>
-		
+	<dependency>
+			
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web-services</artifactId>

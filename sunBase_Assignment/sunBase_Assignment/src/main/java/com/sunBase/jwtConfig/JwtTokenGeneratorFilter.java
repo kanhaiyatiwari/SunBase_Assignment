@@ -1,32 +1,59 @@
 package com.sunBase.jwtConfig;
 
-import java.util.Date;
-
-import org.springframework.stereotype.Service;
-
-import com.sunBase.model.Customer;
-
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-@Service
-public class JwtTokenGeneratorFilter {
+import javax.crypto.SecretKey;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+public class JwtTokenGeneratorFilter extends OncePerRequestFilter {
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+		System.out.println("inside doFilter....");
 
-	public String tokenGerneratorForCustomer(Customer customer) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (null != authentication) {
 
-		Date now = new Date();
-		Date expirationDate = new Date(now.getTime() + 3600 * 1000); // 1 hour
+			SecretKey key = Keys.hmacShaKeyFor(SecurityConstants.JWT_KEY.getBytes());
 
-		// Generate the token
-		String token = Jwts.builder().setSubject("customer")
-				.claim("customertId", customer.getUuid()).claim("mobileNumber", customer.getEmail())
-				.claim("name", customer.getFirst_name()).setIssuedAt(now).setExpiration(expirationDate)
-				.signWith(SignatureAlgorithm.HS256, SecurityConstants.JWT_KEY_CUSTOMER).compact();
+			String jwt = Jwts.builder().setIssuer("Customer").setSubject("JWT Token")
+					.claim("username", authentication.getName())
+					.claim("authorities", populateAuthorities(authentication.getAuthorities())).setIssuedAt(new Date())
+					.setExpiration(new Date(new Date().getTime() + 30000000)).signWith(key).compact();
 
-		// Print the generated token
-		System.out.println(token);
-		return token;
+			response.setHeader(SecurityConstants.JWT_HEADER, jwt);
+
+		}
+
+		filterChain.doFilter(request, response);
 	}
 
+	private String populateAuthorities(Collection<? extends GrantedAuthority> collection) {
+
+		Set<String> authoritiesSet = new HashSet<>();
+
+		for (GrantedAuthority authority : collection) {
+			authoritiesSet.add(authority.getAuthority());
+		}
+		return String.join(",", authoritiesSet);
+	}
+
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+
+		return !request.getServletPath().equals("/api/sunBase/auth/login");
+	}
 }

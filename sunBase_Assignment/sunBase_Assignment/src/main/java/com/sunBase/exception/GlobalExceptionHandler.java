@@ -34,11 +34,11 @@ public class GlobalExceptionHandler {
 	}
 	
 	
-	@ExceptionHandler(TokenException.class)
-	public ResponseEntity<MyErrorDetail> customerExceptionHandlar(TokenException tokenException,WebRequest webRequest){
+	@ExceptionHandler( AdminException.class)
+	public ResponseEntity<MyErrorDetail> customerExceptionHandlar( AdminException  adminException,WebRequest webRequest){
 		MyErrorDetail myError= new MyErrorDetail();
 		myError.setTimeStamp(LocalDateTime.now());
-		myError.setMessage(tokenException.getMessage());
+		myError.setMessage(adminException.getMessage());
 		myError.setDetails(webRequest.getDescription(false));
 		
 		return new ResponseEntity<MyErrorDetail>(myError, HttpStatus.BAD_REQUEST);
