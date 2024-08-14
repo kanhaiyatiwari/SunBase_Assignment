@@ -110,7 +110,7 @@ Follow these steps to set up and run the project locally.
 
 
 ## Demo video 
-[video link](mailto:https://drive.google.com/file/d/1r19Zwmq-1xN30aU4-dMHsPcb4QI7D7za/view?usp=sharing)
+[https://drive.google.com/file/d/1r19Zwmq-1xN30aU4-dMHsPcb4QI7D7za/view?usp=sharing](mailto:https://drive.google.com/file/d/1r19Zwmq-1xN30aU4-dMHsPcb4QI7D7za/view?usp=sharing)
 
 ## Screenshots
 
